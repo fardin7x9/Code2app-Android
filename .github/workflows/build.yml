@@ -5,7 +5,7 @@ on:
     inputs:
       html_code:
         description: 'HTML Code for the app'
-        required: true
+        required: false
         default: '<h1>Hello Code2app</h1>'
       app_name:
         description: 'App Name'
@@ -20,20 +20,21 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+      - name: Generate Gradle Wrapper
+        run: gradle wrapper
 
       - name: Inject User Code
         run: |
+          mkdir -p app/src/main/assets
           echo "${{ github.event.inputs.html_code }}" > app/src/main/assets/index.html
 
       - name: Build Debug APK
-        run: gradle assembleDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
